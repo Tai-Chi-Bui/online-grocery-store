@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ApiAuthModule } from './api-auth.module';
+import { kafkaConfig } from '@app/shared/config/kafka.config';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -9,14 +10,17 @@ async function bootstrap() {
       transport: Transport.KAFKA,
       options: {
         client: {
-          brokers: ['localhost:9092'],
+          brokers: kafkaConfig.brokers,
+          clientId: kafkaConfig.clientId,
         },
         consumer: {
-          groupId: 'auth-consumer',
+          groupId: kafkaConfig.groupId,
         },
       },
     },
   );
+  
   await app.listen();
+  console.log('Auth Microservice is listening');
 }
 bootstrap();
